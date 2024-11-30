@@ -91,6 +91,11 @@
                     <td>{{ vuelo.destino }}</td>
                     <td>{{ vuelo.hora_salida }}</td>
                     <td>{{ vuelo.hora_llegada }}</td>
+                    <td>
+                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#checkInModal{{ reserva.id }}">
+                            Check-in
+                        </button>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -107,5 +112,32 @@
             });
         });
     </script>
+    {% for reserva, vuelo in reservas %}
+    <!-- Modal de Check-in -->
+    <div class="modal fade" id="checkInModal{{ reserva.id }}" tabindex="-1" role="dialog" aria-labelledby="checkInModalLabel{{ reserva.id }}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="checkInModalLabel{{ reserva.id }}">Check-in para {{ vuelo.destino }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" action="{{ url_for('check_in', id=reserva.id) }}">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="maletas_confirmadas">Cantidad de Maletas Confirmadas</label>
+                            <input type="number" class="form-control" name="maletas_confirmadas" min="0" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Confirmar Check-in</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
 </body>
 </html>

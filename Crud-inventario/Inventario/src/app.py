@@ -51,6 +51,12 @@ class Reserva(db.Model):
     vuelo_id = db.Column(db.Integer, db.ForeignKey('vuelo.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+class CheckIn(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fecha_checkin = db.Column(db.Date, nullable=False, default=datetime.utcnow)
+    maletas_confirmadas = db.Column(db.Integer, nullable=False)
+    reserva_id = db.Column(db.Integer, db.ForeignKey('reserva.id'), nullable=False)
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -255,6 +261,10 @@ def aerolinea_dashboard():
 @app.route('/vuelos_creados')
 @login_required
 def vuelos_creados():
+    if not current_user.email.endswith('@aerolinea.com'):
+        flash('Acceso denegado: Solo para usuarios de aerolinea.com.', 'error')
+        return redirect(url_for('index'))
+    
     vuelos = Vuelo.query.all()
     return render_template('vuelos_creados.html', vuelos=vuelos)
 
@@ -328,6 +338,47 @@ def editar_vuelo(id):
     db.session.commit()
     flash('Vuelo actualizado exitosamente', 'success')
     return redirect(url_for('vuelos_creados'))
+
+@app.route('/check_in/<int:id>', methods=['GET', 'POST'])
+@login_required
+def check_in(id):
+    reserva = Reserva.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        maletas_confirmadas = int(request.form['maletas_confirmadas'])
+        
+        nuevo_checkin = CheckIn(
+            maletas_confirmadas=maletas_confirmadas,
+            reserva_id=reserva.id
+        )
+        
+        db.session.add(nuevo_checkin)
+        db.session.commit()
+        
+        flash('Check-in realizado exitosamente', 'success')
+        return redirect(url_for('mis_viajes'))
+    
+    return render_template('check_in.html', reserva=reserva)
+
+@app.route('/reporte_discrepancias', methods=['GET', 'POST'])
+@login_required
+def reporte_discrepancias():
+    if current_user.role != 'admin':
+        flash('Acceso denegado: Se requieren privilegios de administrador.', 'error')
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        fecha_inicio = datetime.strptime(request.form['fecha_inicio'], '%Y-%m-%d').date()
+        fecha_fin = datetime.strptime(request.form['fecha_fin'], '%Y-%m-%d').date()
+        
+        discrepancias = db.session.query(Reserva, CheckIn).join(CheckIn, Reserva.id == CheckIn.reserva_id).filter(
+            Reserva.fecha_reserva.between(fecha_inicio, fecha_fin),
+            Reserva.maletas < CheckIn.maletas_confirmadas
+        ).all()
+        
+        return render_template('reporte_discrepancias.html', discrepancias=discrepancias)
+    
+    return render_template('reporte_discrepancias.html')
 
 if __name__ == '__main__':
     with app.app_context():

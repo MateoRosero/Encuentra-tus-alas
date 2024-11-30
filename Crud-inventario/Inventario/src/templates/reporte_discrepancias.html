@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte de Discrepancias</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">Inicio</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle user-initial" href="#" id="userMenu" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ current_user.username[0] }}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenu">
+                        <a class="dropdown-item" href="{{ url_for('logout') }}">Cerrar sesión</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Contenido de la página -->
+    <div class="container mt-4">
+        <h1>Reporte de Discrepancias</h1>
+        <form method="POST">
+            <div class="form-group">
+                <label for="fecha_inicio">Fecha de Inicio</label>
+                <input type="date" class="form-control" name="fecha_inicio" required>
+            </div>
+            <div class="form-group">
+                <label for="fecha_fin">Fecha de Fin</label>
+                <input type="date" class="form-control" name="fecha_fin" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Generar Reporte</button>
+        </form>
+        
+        {% if discrepancias %}
+        <table class="table mt-4">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Motivo del Viaje</th>
+                    <th>Maletas Reservadas</th>
+                    <th>Maletas Confirmadas</th>
+                    <th>Fecha de Reserva</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reserva, checkin in discrepancias %}
+                <tr>
+                    <td>{{ reserva.nombre_usuario }}</td>
+                    <td>{{ reserva.motivo_viaje }}</td>
+                    <td>{{ reserva.maletas }}</td>
+                    <td>{{ checkin.maletas_confirmadas }}</td>
+                    <td>{{ reserva.fecha_reserva.strftime('%d/%m/%Y') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+</body>
+</html>

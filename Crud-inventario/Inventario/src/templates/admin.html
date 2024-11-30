@@ -73,23 +73,24 @@
 
 <body>
     <!-- Barra de navegación -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">Encuentra tus Alas</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Dashboard Aerolínea</a>
+        <div class="collapse navbar-collapse">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('vuelos_creados') }}">Vuelos</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('reporte_discrepancias') }}">Reporte</a>
+                </li>
                 <li class="nav-item dropdown">
-                    <div class="user-initial" id="userInitial">A</div>
-                    <div class="logout-menu" id="logoutMenu">
-                        <a href="{{ url_for('logout') }}">
-                            <i class="fas fa-arrow-left"></i> Cerrar sesión
-                        </a>
+                    <div class="user-initial" id="userInitial">
+                        {{ current_user.username[0] }}
+                        <div class="logout-menu" id="logoutMenu">
+                            <a href="{{ url_for('logout') }}" class="btn btn-link text-danger">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                            </a>
+                        </div>
                     </div>
                 </li>
             </ul>
