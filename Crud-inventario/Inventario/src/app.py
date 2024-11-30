@@ -149,19 +149,6 @@ def editar_producto(id):
     
     return render_template('editar_producto.html', producto=producto)
 
-@app.route('/eliminar/<int:id>')
-@login_required
-def eliminar(id):
-    producto = Producto.query.get_or_404(id)
-    if producto.user != current_user:
-        flash('No tienes permiso para eliminar este producto')
-        return redirect(url_for('index'))
-    
-    db.session.delete(producto)
-    db.session.commit()
-    print(f"Producto eliminado en la base de datos: {producto.nombre}")
-    flash('Producto eliminado exitosamente')
-    return redirect(url_for('index'))
 
 @app.route('/admin_dashboard')
 @login_required
@@ -187,7 +174,7 @@ def eliminar_usuario(id):
     
     db.session.delete(user)
     db.session.commit()
-    flash('Usuario y sus productos eliminados exitosamente')
+    flash('Usuario eliminado exitosamente')
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/update_role', methods=['POST'])
@@ -327,6 +314,24 @@ def reservar_vuelo(id):
 def mis_viajes():
     reservas = db.session.query(Reserva, Vuelo).join(Vuelo, Reserva.vuelo_id == Vuelo.id).filter(Reserva.user_id == current_user.id).all()
     return render_template('mis_viajes.html', reservas=reservas)
+
+@app.route('/editar_vuelo/<int:id>', methods=['POST'])
+@login_required
+def editar_vuelo(id):
+    vuelo = Vuelo.query.get_or_404(id)
+    
+    # Actualizar los datos del vuelo con los valores del formulario
+    vuelo.origen = request.form['origen']
+    vuelo.destino = request.form['destino']
+    vuelo.fecha = datetime.strptime(request.form['fecha'], '%Y-%m-%d').date()
+    vuelo.hora_salida = request.form['hora_salida']
+    vuelo.hora_llegada = request.form['hora_llegada']
+    vuelo.precio = request.form['precio']
+    
+    # Guardar los cambios en la base de datos
+    db.session.commit()
+    flash('Vuelo actualizado exitosamente', 'success')
+    return redirect(url_for('vuelos_creados'))
 
 if __name__ == '__main__':
     with app.app_context():
