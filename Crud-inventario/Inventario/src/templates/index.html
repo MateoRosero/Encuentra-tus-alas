@@ -93,6 +93,11 @@
                 <label for="fecha_salida">Fecha de salida</label>
                 <input type="date" class="form-control" name="fecha_salida" required>
             </div>
+            <div class="form-group">
+                <label for="presupuesto">Presupuesto</label>
+                <input type="range" class="form-control" name="presupuesto" min="0" max="1000" step="50" value="0" oninput="this.nextElementSibling.value = this.value">
+                <output>0</output>
+            </div>
             <button type="submit" class="btn btn-primary">Buscar</button>
         </form>
     </div>

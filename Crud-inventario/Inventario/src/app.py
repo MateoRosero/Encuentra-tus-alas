@@ -268,9 +268,10 @@ def vuelos_creados():
 @login_required
 def buscar_vuelos():
     destino = request.form['origen']
+    presupuesto = float(request.form['presupuesto'])
     
-    # Buscar vuelos que coincidan con el destino
-    vuelos = Vuelo.query.filter_by(destino=destino).all()
+    # Buscar vuelos que coincidan con el destino y estén dentro del presupuesto
+    vuelos = Vuelo.query.filter(Vuelo.destino == destino, Vuelo.precio <= presupuesto).all()
     
     print(f"Vuelos encontrados: {vuelos}")  # Mensaje de depuración
     
