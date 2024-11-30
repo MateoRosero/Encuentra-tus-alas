@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encuentra tus Alas</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
         .form-container {
             margin-top: 50px;
@@ -52,11 +53,24 @@
             color: rgb(0, 0, 0);
             margin-right: 20px;
         }
+        .hero-image {
+            background-image: url('https://www.tenemosquehablar.com.mx/wp-content/uploads/2023/03/viajarfelizzz.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Encuentra tus Alas</a>
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+            <i class="fas fa-plane"></i> Encuentra tus Alas
+        </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -77,8 +91,6 @@
         </div>
     </nav>
 
-    
-
     <div class="hero-image">
         <h1>Encuentra el mejor lugar</h1>
     </div>
@@ -86,19 +98,19 @@
     <div class="container form-container">
         <form method="POST" action="{{ url_for('buscar_vuelos') }}">
             <div class="form-group">
-                <label for="origen">¿Adónde vamos hoy?</label>
+                <label for="origen"><i class="fas fa-map-marker-alt"></i> ¿Adónde vamos hoy?</label>
                 <input type="text" class="form-control" name="origen" required>
             </div>
             <div class="form-group">
-                <label for="fecha_salida">Fecha de salida</label>
+                <label for="fecha_salida"><i class="fas fa-calendar-alt"></i> Fecha de salida</label>
                 <input type="date" class="form-control" name="fecha_salida" required>
             </div>
             <div class="form-group">
-                <label for="presupuesto">Presupuesto</label>
+                <label for="presupuesto"><i class="fas fa-dollar-sign"></i> Presupuesto</label>
                 <input type="range" class="form-control" name="presupuesto" min="0" max="1000" step="50" value="0" oninput="this.nextElementSibling.value = this.value">
                 <output>0</output>
             </div>
-            <button type="submit" class="btn btn-primary">Buscar</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Buscar</button>
         </form>
     </div>
 
@@ -110,13 +122,6 @@
             $('#userInitial').on('click', function() {
                 $('#logoutMenu').toggle();
             });
-        });
-
-        const budgetSlider = document.getElementById('budget');
-        const budgetValue = document.getElementById('budgetValue');
-
-        budgetSlider.addEventListener('input', function() {
-            budgetValue.textContent = budgetSlider.value;
         });
     </script>
 </body>
