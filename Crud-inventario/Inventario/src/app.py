@@ -255,10 +255,6 @@ def aerolinea_dashboard():
 @app.route('/vuelos_creados')
 @login_required
 def vuelos_creados():
-    if not current_user.email.endswith('@aerolinea.com'):
-        flash('Acceso denegado: Solo para usuarios de aerolinea.com.', 'error')
-        return redirect(url_for('index'))
-    
     vuelos = Vuelo.query.all()
     return render_template('vuelos_creados.html', vuelos=vuelos)
 
