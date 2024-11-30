@@ -21,6 +21,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
+    cedula = db.Column(db.String(20), unique=True, nullable=False)
     role = db.Column(db.String(20), nullable=False, default='passenger')
     productos = db.relationship('Producto', backref='user', lazy=True)
 
@@ -104,6 +105,18 @@ def register():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
+        cedula = request.form['cedula']
+        
+        # Validar formato de cédula (ejemplo simple)
+        if not cedula.isdigit() or len(cedula) != 10:
+            flash('Cédula inválida. Debe ser un número de 10 dígitos.', 'error')
+            return render_template('register.html')
+        
+        # Verificar si la cédula ya existe
+        existing_cedula = User.query.filter_by(cedula=cedula).first()
+        if existing_cedula:
+            flash('La cédula ya está en uso. Por favor, elige otra.', 'error')
+            return render_template('register.html')
         
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
@@ -115,7 +128,7 @@ def register():
         # Asignar el rol 'airline' si el correo es de @aerolinea.com
         role = 'airline' if email.endswith('@aerolinea.com') else 'passenger'
         
-        new_user = User(username=username, email=email, password=hashed_password, role=role)
+        new_user = User(username=username, email=email, password=hashed_password, role=role, cedula=cedula)
         
         db.session.add(new_user)
         db.session.commit()
