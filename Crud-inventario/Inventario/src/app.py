@@ -31,6 +31,15 @@ class Producto(db.Model):
     fecha_vencimiento = db.Column(db.Date)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
 
+class Vuelo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    origen = db.Column(db.String(100), nullable=False)
+    destino = db.Column(db.String(100), nullable=False)
+    fecha = db.Column(db.Date, nullable=False)
+    hora_salida = db.Column(db.Time, nullable=False)
+    hora_llegada = db.Column(db.Time, nullable=False)
+    precio = db.Column(db.Float, nullable=False)
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -65,6 +74,8 @@ def login():
             flash('Has iniciado sesión correctamente', 'success')
             if user.email == 'admin@admin.com':
                 return redirect(url_for('admin_dashboard'))
+            elif user.role == 'airline':
+                return redirect(url_for('aerolinea_dashboard'))
             else:
                 return redirect(url_for('index'))
         flash('Credenciales inválidas. Por favor, intenta de nuevo.', 'error')
@@ -83,13 +94,21 @@ def register():
             return render_template('register.html')
         
         hashed_password = generate_password_hash(password)
-        # Asignar el rol por defecto 'passenger'
-        new_user = User(username=username, email=email, password=hashed_password, role='passenger')
+        
+        # Asignar el rol 'airline' si el correo es de @aerolinea.com
+        role = 'airline' if email.endswith('@aerolinea.com') else 'passenger'
+        
+        new_user = User(username=username, email=email, password=hashed_password, role=role)
         
         db.session.add(new_user)
         db.session.commit()
         
         flash('Te has registrado correctamente. Ahora puedes iniciar sesión.', 'success')
+
+        # Redirigir a la página exclusiva si el correo es de @aerolinea.com
+        if email.endswith('@aerolinea.com'):
+            return redirect(url_for('aerolinea_dashboard'))
+        
         return redirect(url_for('login'))
     
     return render_template('register.html')
@@ -136,12 +155,8 @@ def eliminar(id):
 @app.route('/admin_dashboard')
 @login_required
 def admin_dashboard():
-    if current_user.email != 'admin@admin.com':
-        flash('Acceso denegado: Se requieren privilegios de administrador.', 'error')
-        return redirect(url_for('index'))
-    
-    users = User.query.all()
-    return render_template('admin.html', users=users, user=current_user)
+    users = User.query.all()  # Asegúrate de que esta consulta esté correcta
+    return render_template('admin.html', users=users)
 
 @app.route('/eliminar_usuario/<int:id>', methods=['POST'])
 @login_required
@@ -183,9 +198,16 @@ def edit_user():
     username = request.form.get('username')
     email = request.form.get('email')
     role = request.form.get('role')
-    
+
     user = User.query.get(user_id)
     if user:
+        # Verificar si ya existe un administrador
+        if role == 'admin':
+            admin_existente = User.query.filter_by(role='admin').first()
+            if admin_existente and admin_existente.id != user.id:
+                flash('Ya existe un administrador. No se puede asignar el rol de administrador a otro usuario.', 'error')
+                return redirect(url_for('admin_dashboard'))
+
         user.username = username
         user.email = email
         user.role = role
@@ -193,8 +215,49 @@ def edit_user():
         flash('Usuario actualizado exitosamente', 'success')
     else:
         flash('Error al actualizar el usuario', 'error')
-    
+
     return redirect(url_for('admin_dashboard'))
+
+@app.route('/aerolinea_dashboard', methods=['GET', 'POST'])
+@login_required
+def aerolinea_dashboard():
+    if not current_user.email.endswith('@aerolinea.com'):
+        flash('Acceso denegado: Solo para usuarios de aerolinea.com.', 'error')
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        origen = request.form['origen']
+        destino = request.form['destino']
+        fecha = request.form['fecha']
+        hora_salida = request.form['hora_salida']
+        hora_llegada = request.form['hora_llegada']
+        precio = request.form['precio']
+        
+        nuevo_vuelo = Vuelo(
+            origen=origen,
+            destino=destino,
+            fecha=datetime.strptime(fecha, '%Y-%m-%d').date(),
+            hora_salida=hora_salida,
+            hora_llegada=hora_llegada,
+            precio=precio
+        )
+        db.session.add(nuevo_vuelo)
+        db.session.commit()
+        flash('Vuelo creado exitosamente', 'success')
+    
+    vuelos = Vuelo.query.all()
+    
+    return render_template('aerolinea_dashboard.html', vuelos=vuelos)
+
+@app.route('/vuelos_creados')
+@login_required
+def vuelos_creados():
+    if not current_user.email.endswith('@aerolinea.com'):
+        flash('Acceso denegado: Solo para usuarios de aerolinea.com.', 'error')
+        return redirect(url_for('index'))
+    
+    vuelos = Vuelo.query.all()
+    return render_template('vuelos_creados.html', vuelos=vuelos)
 
 if __name__ == '__main__':
     with app.app_context():

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,18 +13,23 @@
             margin: 20px auto;
             display: block;
         }
+
         .carousel-item {
             text-align: center;
         }
+
         .admin-name {
             color: green;
         }
+
         .airline-name {
             color: red;
         }
+
         .passenger-name {
             color: black;
         }
+
         .user-initial {
             width: 40px;
             height: 40px;
@@ -37,6 +43,7 @@
             cursor: pointer;
             position: relative;
         }
+
         .logout-menu {
             display: none;
             position: absolute;
@@ -49,6 +56,7 @@
             width: 150px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+
         .logout-menu a {
             text-decoration: none;
             color: black;
@@ -56,16 +64,19 @@
             display: flex;
             align-items: center;
         }
+
         .logout-menu i {
             margin-right: 5px;
         }
     </style>
 </head>
+
 <body>
     <!-- Barra de navegación -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="#">Encuentra tus Alas</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -87,6 +98,16 @@
 
     <div class="container mt-4">
         <h2>Administración de Usuarios</h2>
+
+        <!-- Mostrar mensajes flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} mt-2 flash-message">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
         <table class="table table-striped mt-4">
             <thead class="thead-dark">
                 <tr>
@@ -99,15 +120,19 @@
             <tbody>
                 {% for user in users %}
                 <tr>
-                    <td class="{% if user.role == 'admin' %}admin-name{% elif user.role == 'airline' %}airline-name{% else %}passenger-name{% endif %}">
-                        <i class="fas {% if user.role == 'admin' %}fa-briefcase{% elif user.role == 'airline' %}fa-plane{% else %}fa-user{% endif %} role-icon"></i>
+                    <td
+                        class="{% if user.role == 'admin' %}admin-name{% elif user.role == 'airline' %}airline-name{% else %}passenger-name{% endif %}">
+                        <i
+                            class="fas {% if user.role == 'admin' %}fa-briefcase{% elif user.role == 'airline' %}fa-plane{% else %}fa-user{% endif %} role-icon"></i>
                         {{ user.username }}
                     </td>
                     <td>{{ user.email }}</td>
                     <td>{{ user.role }}</td>
                     <td>
                         {% if user.role != 'admin' %}
-                        <button class="btn btn-warning" data-toggle="modal" data-target="#editUserModal" data-id="{{ user.id }}" data-username="{{ user.username }}" data-email="{{ user.email }}" data-role="{{ user.role }}">Editar</button>
+                        <button class="btn btn-warning" data-toggle="modal" data-target="#editUserModal"
+                            data-id="{{ user.id }}" data-username="{{ user.username }}" data-email="{{ user.email }}"
+                            data-role="{{ user.role }}">Editar</button>
                         <button class="btn btn-danger">Eliminar</button>
                         {% endif %}
                     </td>
@@ -159,27 +184,6 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            $('#editUserModal').on('show.bs.modal', function (event) {
-                const button = $(event.relatedTarget);
-                const id = button.data('id');
-                const username = button.data('username');
-                const email = button.data('email');
-                const role = button.data('role');
-
-                const modal = $(this);
-                modal.find('#editUserId').val(id);
-                modal.find('#editUserName').val(username);
-                modal.find('#editUserEmail').val(email);
-                modal.find('#editUserRole').val(role);
-            });
-
-            // Mostrar menú de cierre de sesión
-            $('#userInitial').on('click', function() {
-                $('#logoutMenu').toggle();
-            });
-        });
-    </script>
 </body>
+
 </html>
