@@ -264,6 +264,26 @@ def vuelos_creados():
     vuelos = Vuelo.query.all()
     return render_template('vuelos_creados.html', vuelos=vuelos)
 
+@app.route('/buscar_vuelos', methods=['POST'])
+@login_required
+def buscar_vuelos():
+    destino = request.form['origen']
+    
+    # Buscar vuelos que coincidan con el destino
+    vuelos = Vuelo.query.filter_by(destino=destino).all()
+    
+    print(f"Vuelos encontrados: {vuelos}")  # Mensaje de depuración
+    
+    return render_template('vuelos_encontrados.html', vuelos=vuelos)
+
+@app.route('/reservar_vuelo/<int:id>', methods=['POST'])
+@login_required
+def reservar_vuelo(id):
+    vuelo = Vuelo.query.get_or_404(id)
+    # Aquí puedes agregar la lógica para guardar la reserva en la base de datos
+    flash('Vuelo reservado exitosamente', 'success')
+    return redirect(url_for('index'))
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

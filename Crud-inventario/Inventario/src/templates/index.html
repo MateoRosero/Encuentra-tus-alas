@@ -84,30 +84,14 @@
     </div>
 
     <div class="container form-container">
-        <form>
+        <form method="POST" action="{{ url_for('buscar_vuelos') }}">
             <div class="form-group">
-                <label for="destination">¿Adónde vamos hoy?</label>
-                <input type="text" class="form-control" id="destination" placeholder="Ciudad o aeropuerto">
+                <label for="origen">¿Adónde vamos hoy?</label>
+                <input type="text" class="form-control" name="origen" required>
             </div>
             <div class="form-group">
-                <label for="departure">Fecha de salida</label>
-                <input type="date" class="form-control" id="departure">
-            </div>
-            <div class="form-group">
-                <label for="return">Fecha de retorno</label>
-                <input type="date" class="form-control" id="return">
-            </div>
-            <div class="form-group">
-                <label for="budget">Presupuesto: $<span id="budgetValue">500</span></label>
-                <input type="range" class="form-control-range" id="budget" min="0" max="5000" step="50" value="500">
-            </div>
-            <div class="form-group">
-                <label>Selecciona el motivo de tu viaje</label>
-                <div>
-                    <button type="button" class="btn btn-outline-primary">Negocios</button>
-                    <button type="button" class="btn btn-outline-primary">Visita Familiar</button>
-                    <button type="button" class="btn btn-outline-primary">Turismo</button>
-                </div>
+                <label for="fecha_salida">Fecha de salida</label>
+                <input type="date" class="form-control" name="fecha_salida" required>
             </div>
             <button type="submit" class="btn btn-primary">Buscar</button>
         </form>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Vuelos Encontrados</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Vuelos Encontrados</h1>
+        {% if vuelos %}
+            <div class="list-group">
+                {% for vuelo in vuelos %}
+                <div class="list-group-item">
+                    <h5 class="mb-1">{{ vuelo.origen }} a {{ vuelo.destino }}</h5>
+                    <p class="mb-1">Fecha: {{ vuelo.fecha }} | Hora de Salida: {{ vuelo.hora_salida }} | Hora de Llegada: {{ vuelo.hora_llegada }}</p>
+                    <small>Precio: ${{ vuelo.precio }}</small>
+                    <form method="POST" action="{{ url_for('reservar_vuelo', id=vuelo.id) }}">
+                        <button type="submit" class="btn btn-success">Reservar</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No se encontraron vuelos para la búsqueda.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
