@@ -47,6 +47,7 @@
                     <th>Maletas Reservadas</th>
                     <th>Maletas Confirmadas</th>
                     <th>Fecha de Reserva</th>
+                    <th>Fecha de Check-in</th>
                 </tr>
             </thead>
             <tbody>
@@ -57,6 +58,7 @@
                     <td>{{ reserva.maletas }}</td>
                     <td>{{ checkin.maletas_confirmadas }}</td>
                     <td>{{ reserva.fecha_reserva.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ checkin.fecha_checkin.strftime('%d/%m/%Y') }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -346,9 +346,11 @@ def check_in(id):
     
     if request.method == 'POST':
         maletas_confirmadas = int(request.form['maletas_confirmadas'])
+        fecha_checkin = request.form['fecha_checkin']
         
         nuevo_checkin = CheckIn(
             maletas_confirmadas=maletas_confirmadas,
+            fecha_checkin=fecha_checkin,
             reserva_id=reserva.id
         )
         
@@ -372,7 +374,7 @@ def reporte_discrepancias():
         fecha_fin = datetime.strptime(request.form['fecha_fin'], '%Y-%m-%d').date()
         
         discrepancias = db.session.query(Reserva, CheckIn).join(CheckIn, Reserva.id == CheckIn.reserva_id).filter(
-            Reserva.fecha_reserva.between(fecha_inicio, fecha_fin),
+            CheckIn.fecha_checkin.between(fecha_inicio, fecha_fin),
             Reserva.maletas < CheckIn.maletas_confirmadas
         ).all()
         
