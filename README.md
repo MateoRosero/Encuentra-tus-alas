@@ -1,66 +1,75 @@
-# CRUD Inventario
+# Proyecto de Inventario y Gestión de Vuelos
 
-Este proyecto es una aplicación web para la gestión de inventario y usuarios, desarrollada con Flask y MySQL. Permite a los usuarios registrarse, iniciar sesión, y gestionar productos en su inventario. Los administradores tienen privilegios adicionales para gestionar usuarios y sus roles.
+Este proyecto es una aplicación web desarrollada con Flask que permite gestionar un inventario de productos y administrar vuelos y reservas. Incluye funcionalidades para usuarios con diferentes roles, como pasajeros, aerolíneas y administradores, además de una funcionalidad de check-in para los pasajeros y el administrador puede generar un reporte de discrepancias con el check-in y filtrar por fecha.
 
 ## Características
 
-- **Autenticación de Usuarios**: Registro, inicio de sesión y cierre de sesión.
-- **Gestión de Vuelos**: Crear, editar y eliminar vuelos.
-- **Roles de Usuario**: Asignación de roles como 'admin', 'airline', y 'passenger'.
-- **Interfaz de Administración**: Los administradores pueden ver y gestionar todos los usuarios.
+- **Gestión de Usuarios**: Registro, inicio de sesión y roles de usuario (pasajero, aerolínea, administrador).
+- **Gestión de Vuelos**: Las aerolíneas pueden crear y editar vuelos.
+- **Reservas de Vuelos**: Los usuarios pueden buscar vuelos y realizar reservas.
+- **Check-In**: Funcionalidad para realizar el check-in de reservas.
+- **Panel de Administración**: Los administradores pueden gestionar usuarios y generar reportes de discrepancias.
 
-## Tecnologías Utilizadas
+## Requisitos
 
-- **Backend**: Flask
-- **Base de Datos**: MySQL
-- **Frontend**: HTML, CSS, Bootstrap
-- **Autenticación**: Flask-Login
-- **Seguridad**: Werkzeug para el hash de contraseñas
+- Python 3.x
+- Flask
+- Flask-SQLAlchemy
+- Flask-Login
+- MySQL
 
 ## Instalación
 
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/tu_usuario/Crud-inventario.git
+   git clone https://github.com/tu_usuario/tu_repositorio.git
    ```
-
 2. Navega al directorio del proyecto:
    ```bash
    cd Crud-inventario/Inventario
    ```
-
 3. Instala las dependencias:
    ```bash
    pip install -r requirements.txt
    ```
-
-4. Configura la base de datos en `src/app.py` y `src/database.py` con tus credenciales de MySQL.
-
-5. Crea las tablas de la base de datos:
+4. Configura la base de datos en `app.py`:
+   ```python
+   app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://usuario:contraseña@localhost/dbInventario'
+   ```
+5. Ejecuta la aplicación:
    ```bash
    python src/app.py
    ```
 
 ## Uso
 
-1. Ejecuta la aplicación:
-   ```bash
-   python src/app.py
-   ```
+- **Inicio de Sesión**: Accede a la aplicación y utiliza las credenciales para iniciar sesión.
+- **Registro**: Crea una cuenta nueva con un rol asignado automáticamente según el correo electrónico.
+- **Gestión de Productos**: Añade, edita y visualiza productos desde el panel de usuario.
+- **Gestión de Vuelos**: Las aerolíneas pueden gestionar vuelos desde su panel exclusivo.
+- **Reservas**: Busca y reserva vuelos disponibles.
+- **Check-In**: Realiza el check-in de tus reservas.
+- **Administración**: Los administradores pueden gestionar usuarios y ver reportes de discrepancias.
 
-2. Abre tu navegador y ve a `http://localhost:5000`.
+## Roles de Usuario
 
-3. Regístrate o inicia sesión para comenzar a usar la aplicación.
+- **Pasajero**: Puede gestionar su inventario de productos y realizar reservas de vuelos.
+- **Aerolínea**: Puede crear y editar vuelos.
+- **Administrador**: Tiene acceso a todas las funcionalidades, incluyendo la gestión de usuarios y reportes.
 
-## Estructura del Proyecto
+## Seguridad
 
-- `src/app.py`: Archivo principal de la aplicación Flask.
-- `src/templates/`: Contiene las plantillas HTML para las diferentes vistas.
-- `src/database.py`: Configuración de la conexión a la base de datos MySQL.
+- Las contraseñas se almacenan de forma segura utilizando `werkzeug.security`.
+- Se requiere autenticación para acceder a la mayoría de las rutas.
 
 ## Contribuciones
 
 Las contribuciones son bienvenidas. Por favor, abre un issue o un pull request para discutir cualquier cambio que desees realizar.
+
+## Autor
+
+- **Nombre**: André Rosero
+- **Correo**: andre.rosero@udla.edu.ec
 
 ## Licencia
 
