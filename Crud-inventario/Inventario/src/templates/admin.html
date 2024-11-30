@@ -103,7 +103,7 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
-        <div class="alert alert-{{ category }} mt-2 flash-message">{{ message }}</div>
+        <div class="alert alert-{{ category }} mt-2">{{ message }}</div>
         {% endfor %}
         {% endif %}
         {% endwith %}
@@ -133,7 +133,9 @@
                         <button class="btn btn-warning" data-toggle="modal" data-target="#editUserModal"
                             data-id="{{ user.id }}" data-username="{{ user.username }}" data-email="{{ user.email }}"
                             data-role="{{ user.role }}">Editar</button>
-                        <button class="btn btn-danger">Eliminar</button>
+                        <form method="POST" action="{{ url_for('eliminar_usuario', id=user.id) }}">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
                         {% endif %}
                     </td>
                 </tr>
@@ -184,6 +186,38 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            $('#editUserModal').on('show.bs.modal', function (event) {
+                const button = $(event.relatedTarget);
+                const id = button.data('id');
+                const username = button.data('username');
+                const email = button.data('email');
+                const role = button.data('role');
+
+                const modal = $(this);
+                modal.find('#editUserId').val(id);
+                modal.find('#editUserName').val(username);
+                modal.find('#editUserEmail').val(email);
+                modal.find('#editUserRole').val(role);
+            });
+
+            // Mostrar menú de cierre de sesión
+            $('#userInitial').on('click', function () {
+                $('#logoutMenu').toggle();
+            });
+        });
+
+        // Función para eliminar mensajes flash después de 3 segundos
+        setTimeout(function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(message) {
+                message.style.transition = 'opacity 0.5s ease';
+                message.style.opacity = '0';
+                setTimeout(() => message.remove(), 500);
+            });
+        }, 3000);
+    </script>
 </body>
 
 </html>

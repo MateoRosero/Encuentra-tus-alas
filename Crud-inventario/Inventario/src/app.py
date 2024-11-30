@@ -155,8 +155,12 @@ def eliminar(id):
 @app.route('/admin_dashboard')
 @login_required
 def admin_dashboard():
-    users = User.query.all()  # Asegúrate de que esta consulta esté correcta
-    return render_template('admin.html', users=users)
+    if current_user.email != 'admin@admin.com':
+        flash('Acceso denegado: Se requieren privilegios de administrador.', 'error')
+        return redirect(url_for('index'))
+    
+    users = User.query.all()
+    return render_template('admin.html', users=users, user=current_user)
 
 @app.route('/eliminar_usuario/<int:id>', methods=['POST'])
 @login_required
@@ -217,6 +221,7 @@ def edit_user():
         flash('Error al actualizar el usuario', 'error')
 
     return redirect(url_for('admin_dashboard'))
+
 
 @app.route('/aerolinea_dashboard', methods=['GET', 'POST'])
 @login_required
