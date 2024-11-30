@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Viajes</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Mis Viajes</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Motivo del Viaje</th>
+                    <th>Cantidad de Asientos</th>
+                    <th>Clase</th>
+                    <th>Maletas</th>
+                    <th>Fecha de Reserva</th>
+                    <th>Destino</th>
+                    <th>Hora de Salida</th>
+                    <th>Hora de Llegada</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reserva, vuelo in reservas %}
+                <tr>
+                    <td>{{ reserva.motivo_viaje }}</td>
+                    <td>{{ reserva.cantidad_asientos }}</td>
+                    <td>{{ reserva.clase }}</td>
+                    <td>{{ reserva.maletas }}</td>
+                    <td>{{ reserva.fecha_reserva.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ vuelo.destino }}</td>
+                    <td>{{ vuelo.hora_salida }}</td>
+                    <td>{{ vuelo.hora_llegada }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

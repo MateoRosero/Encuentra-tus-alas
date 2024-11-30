@@ -40,6 +40,17 @@ class Vuelo(db.Model):
     hora_llegada = db.Column(db.Time, nullable=False)
     precio = db.Column(db.Float, nullable=False)
 
+class Reserva(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fecha_reserva = db.Column(db.Date, nullable=False, default=datetime.utcnow)
+    motivo_viaje = db.Column(db.String(200), nullable=False)
+    nombre_usuario = db.Column(db.String(80), nullable=False)
+    cantidad_asientos = db.Column(db.Integer, nullable=False)
+    clase = db.Column(db.String(20), nullable=False)
+    maletas = db.Column(db.Integer, nullable=False)
+    vuelo_id = db.Column(db.Integer, db.ForeignKey('vuelo.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -277,13 +288,45 @@ def buscar_vuelos():
     
     return render_template('vuelos_encontrados.html', vuelos=vuelos)
 
-@app.route('/reservar_vuelo/<int:id>', methods=['POST'])
+@app.route('/reservar_vuelo/<int:id>', methods=['GET', 'POST'])
 @login_required
 def reservar_vuelo(id):
     vuelo = Vuelo.query.get_or_404(id)
-    # Aquí puedes agregar la lógica para guardar la reserva en la base de datos
-    flash('Vuelo reservado exitosamente', 'success')
-    return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        print(request.form)  # Esto imprimirá todos los datos enviados en el formulario
+        
+        motivo_viaje = request.form.get('motivo_viaje')
+        cantidad_asientos = request.form.get('cantidad_asientos')
+        if not cantidad_asientos:
+            flash('La cantidad de asientos es obligatoria', 'error')
+            return redirect(url_for('reservar_vuelo', id=vuelo.id))
+        clase = request.form['clase']
+        maletas = int(request.form['maletas'])
+        
+        nueva_reserva = Reserva(
+            motivo_viaje=motivo_viaje,
+            nombre_usuario=current_user.username,
+            cantidad_asientos=cantidad_asientos,
+            clase=clase,
+            maletas=maletas,
+            vuelo_id=vuelo.id,
+            user_id=current_user.id
+        )
+        
+        db.session.add(nueva_reserva)
+        db.session.commit()
+        
+        flash('Reserva realizada exitosamente', 'success')
+        return redirect(url_for('index'))
+    
+    return render_template('reservar.html', vuelo=vuelo)
+
+@app.route('/mis_viajes')
+@login_required
+def mis_viajes():
+    reservas = db.session.query(Reserva, Vuelo).join(Vuelo, Reserva.vuelo_id == Vuelo.id).filter(Reserva.user_id == current_user.id).all()
+    return render_template('mis_viajes.html', reservas=reservas)
 
 if __name__ == '__main__':
     with app.app_context():
