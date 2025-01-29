@@ -7,6 +7,9 @@ import logging
 from models import db, User, Producto, Vuelo, Reserva, CheckIn
 from auth import auth as auth_blueprint
 from config import Config
+from role_assigner import RoleAssigner
+from repository import UserRepository
+from factories import VueloFactory
 
 logging.basicConfig(level=logging.INFO)
 
@@ -128,19 +131,12 @@ def aerolinea_dashboard():
     if request.method == 'POST':
         origen = request.form['origen']
         destino = request.form['destino']
-        fecha = request.form['fecha']
+        fecha = datetime.strptime(request.form['fecha'], '%Y-%m-%d').date()
         hora_salida = request.form['hora_salida']
         hora_llegada = request.form['hora_llegada']
         precio = request.form['precio']
         
-        nuevo_vuelo = Vuelo(
-            origen=origen,
-            destino=destino,
-            fecha=datetime.strptime(fecha, '%Y-%m-%d').date(),
-            hora_salida=hora_salida,
-            hora_llegada=hora_llegada,
-            precio=precio
-        )
+        nuevo_vuelo = VueloFactory.crear_vuelo(origen, destino, fecha, hora_salida, hora_llegada, precio)
         db.session.add(nuevo_vuelo)
         db.session.commit()
         flash('Vuelo creado exitosamente', 'success')
@@ -272,6 +268,13 @@ def reporte_discrepancias():
         return render_template('reporte_discrepancias.html', discrepancias=discrepancias)
     
     return render_template('reporte_discrepancias.html')
+
+def register_user(email):
+    role = RoleAssigner.assign_role(email)
+    user = UserRepository.get_user_by_email(email)
+    if not user:
+        hashed_password = generate_password_hash('default_password')
+        UserRepository.create_user('default_username', email, hashed_password, role, 'default_cedula')
 
 if __name__ == '__main__':
     with app.app_context():
