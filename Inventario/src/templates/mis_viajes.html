@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Viajes</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        .navbar {
+            margin-bottom: 20px;
+        }
+        .user-initial {
+            width: 40px;
+            height: 40px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            position: relative;
+        }
+        .logout-menu {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            top: 50px;
+            right: 0;
+            width: 150px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .logout-menu a {
+            text-decoration: none;
+            color: black;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        .logout-menu i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+            <i class="fas fa-plane"></i> Encuentra tus Alas
+        </a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <div class="user-initial" id="userInitial">{{ current_user.username[0] }}</div>
+                    <div class="logout-menu" id="logoutMenu">
+                        <a href="{{ url_for('auth.logout') }}">
+                            <i class="fas fa-arrow-left"></i> Cerrar sesión
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1>Mis Viajes</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-briefcase"></i> Motivo del Viaje</th>
+                    <th><i class="fas fa-chair"></i> Cantidad de Asientos</th>
+                    <th><i class="fas fa-ticket-alt"></i> Clase</th>
+                    <th><i class="fas fa-suitcase"></i> Maletas</th>
+                    <th><i class="fas fa-calendar-alt"></i> Fecha de Reserva</th>
+                    <th><i class="fas fa-map-marker-alt"></i> Destino</th>
+                    <th><i class="fas fa-clock"></i> Hora de Salida</th>
+                    <th><i class="fas fa-clock"></i> Hora de Llegada</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reserva, vuelo in reservas %}
+                <tr>
+                    <td>{{ reserva.motivo_viaje }}</td>
+                    <td>{{ reserva.cantidad_asientos }}</td>
+                    <td>{{ reserva.clase }}</td>
+                    <td>{{ reserva.maletas }}</td>
+                    <td>{{ reserva.fecha_reserva.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ vuelo.destino }}</td>
+                    <td>{{ vuelo.hora_salida }}</td>
+                    <td>{{ vuelo.hora_llegada }}</td>
+                    <td>
+                        {% if reserva.checkin_realizado %}
+                        <button type="button" class="btn btn-success" disabled>Check-in Confirmado</button>
+                        {% else %}
+                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#checkInModal{{ reserva.id }}">
+                            Check-in
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $('#userInitial').on('click', function() {
+                $('#logoutMenu').toggle();
+            });
+        });
+    </script>
+    {% for reserva, vuelo in reservas %}
+    <!-- Modal de Check-in -->
+    <div class="modal fade" id="checkInModal{{ reserva.id }}" tabindex="-1" role="dialog" aria-labelledby="checkInModalLabel{{ reserva.id }}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="checkInModalLabel{{ reserva.id }}">Check-in para {{ vuelo.destino }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form method="POST" action="{{ url_for('check_in', id=reserva.id) }}">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="maletas_confirmadas">Cantidad de Maletas Confirmadas</label>
+                            <input type="number" class="form-control" name="maletas_confirmadas" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha_checkin">Fecha de Check-in</label>
+                            <input type="date" class="form-control" name="fecha_checkin" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Confirmar Check-in</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</body>
+</html>
